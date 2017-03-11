@@ -27,7 +27,11 @@ namespace FacebookMessageParser
             parser.Setup<string>('o', "ouput")
                 .Callback(arg => outputFile = arg);
             parser.Setup<List<string>>('f', "from")
-                .Callback(arg => from = arg);
+                .Callback(arg =>
+                {
+                    from = arg;
+                    parseOnly = false;
+                });
 
             parser.Parse(args);
 
