@@ -42,9 +42,14 @@ namespace FacebookMessageParser
         private static List<Message> FilterMessages(string inputFile, List<string> from, string outputFile=null)
         {
             var json = inputFile.EndsWith(".htm") ? ParseFacebookFormat(inputFile) : File.ReadAllText(inputFile);
-            var messages = JsonConvert.DeserializeObject<List<Message>>(json);
 
+            Console.WriteLine("Loading json...");
+            var messages = JsonConvert.DeserializeObject<List<Message>>(json);
+            Console.WriteLine("Done!");
+
+            Console.WriteLine("Filtering..");
             var result = messages.Where(message => from.Any(f => f == message.Sender)).ToList();
+            Console.WriteLine("Done!");
 
             if (outputFile != null)
             {
