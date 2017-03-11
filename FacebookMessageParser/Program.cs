@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fclp;
 using Newtonsoft.Json;
 
 namespace FacebookMessageParser
@@ -12,13 +13,49 @@ namespace FacebookMessageParser
     {
         static void Main(string[] args)
         {
-            ParseFacebookFormat("message.htm", "message.json");
+            string inputFile = "message-pretty.htm";
+            string outputFile = null;
+            var parseOnly = true;
+            List<string> from = null;
+
+            var parser = new FluentCommandLineParser();
+            parser.Setup<bool>('p', "parse")
+                .Callback(arg => parseOnly = arg)
+                .SetDefault(true);
+            parser.Setup<string>('i', "input")
+                .Callback(arg => inputFile = arg);
+            parser.Setup<string>('o', "ouput")
+                .Callback(arg => outputFile = arg);
+            parser.Setup<List<string>>('f', "from")
+                .Callback(arg => from = arg);
+
+            parser.Parse(args);
+
+            if (parseOnly)
+                ParseFacebookFormat(inputFile, outputFile);
+            else FilterMessages(inputFile, from, outputFile);
 
             Console.WriteLine("Done! (press any key to exit)");
             Console.ReadKey();
         }
 
-        private static void ParseFacebookFormat(string inputFile, string outputFile)
+        private static List<Message> FilterMessages(string inputFile, List<string> from, string outputFile=null)
+        {
+            var json = inputFile.EndsWith(".htm") ? ParseFacebookFormat(inputFile) : File.ReadAllText(inputFile);
+            var messages = JsonConvert.DeserializeObject<List<Message>>(json);
+
+            var result = messages.Where(message => from.Any(f => f == message.Sender)).ToList();
+
+            if (outputFile != null)
+            {
+                var outputJson = JsonConvert.SerializeObject(result);
+                File.WriteAllText(outputFile, outputJson);
+            }
+
+            return result;
+        }
+
+        private static string ParseFacebookFormat(string inputFile, string outputFile=null)
         {
             Console.WriteLine("Loading input html...");
             var inputText = File.ReadAllText(inputFile);
@@ -31,7 +68,8 @@ namespace FacebookMessageParser
             var json = JsonConvert.SerializeObject(messages, Formatting.Indented);
             if (outputFile != null)
                 File.WriteAllText(json, outputFile);
-            else Console.WriteLine(json);
+
+            return json;
         }
     }
 }

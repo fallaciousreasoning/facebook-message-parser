@@ -16,7 +16,7 @@ namespace FacebookMessageParser
 
             var document = htmlDoc.DocumentNode;
 
-            var messageHeaders = document.SelectNodes("//div[@class='message']").Take(10);
+            var messageHeaders = document.SelectNodes("//div[@class='message']");
             var result = (from header in messageHeaders select new Message
             {
                 Text = header.SelectSingleNode("./following-sibling::p")?.InnerText.Trim(),
