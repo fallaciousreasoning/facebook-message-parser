@@ -20,10 +20,10 @@ namespace FacebookMessageParser
             var result = (from header in messageHeaders select new Message
             {
                 Text = header.SelectSingleNode("./following-sibling::p")?.InnerText.Trim(),
-                Sender = header.SelectSingleNode("(//div/span)[1]").InnerText.Trim(),
-                SentDate = header.SelectSingleNode("(//div/span)[2]").InnerText.Trim()
+                Sender = header.SelectSingleNode("(./div/span)[1]").InnerText.Trim(),
+                SentDate = header.SelectSingleNode("(./div/span)[2]").InnerText.Trim()
             });
-            return result.ToList();
+           return result.ToList();
         }
     }
 }
