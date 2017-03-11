@@ -72,7 +72,7 @@ namespace FacebookMessageParser
 
             var json = JsonConvert.SerializeObject(messages, Formatting.Indented);
             if (outputFile != null)
-                File.WriteAllText(json, outputFile);
+                File.WriteAllText(outputFile, json);
 
             return json;
         }
